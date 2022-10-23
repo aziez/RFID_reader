@@ -5,12 +5,28 @@ import requests
 from serial import *
 from datetime import  datetime
 
-class scanner:
-    PRESENT_Value = 0xFFFF
-    POLYMONIAL = 0x8408
+from main import crc
 
-    test_serial = Serial('COM')
+PRESET_Value = 0xFFFF
+POLYNOMIAL = 0x8408
 
+test_serial = Serial('COM3', 57600, timeout=0.1)
+now = datetime.now()
+dt_string = now.strftime("%d/%m/%y %H:%M:%S")
+
+# scan
+INVENTORY1 = '06 00 01 00 06'  # membaca TID
+INVENTORY2 = '04 00 0F' #Membaca EPC
+# read EPC
+readTagMem = '12 00 02 02 11 22 33 44 01 00 04 00 00 00 00 00 00'
+# change EPC
+writeEpc = '0D 00 04 02 00 00 00 00 11 22 33 44'
+# set data
+setAddress = '05 00 24 03'
+
+#SEND DATA TO API
+url = 'https://reqres.in/api/users'
+startTime = time.time()
 
 class main:
     def __init__(self, master=None):
@@ -39,14 +55,14 @@ class main:
         self.ttk_inv1.grid(column=0, row=0)
         self.inventory1 = ttk.Entry(self.frame1)
         self.inv1 = tk.StringVar(
-            value='11 222 555 33 66 55 44 55 66 55 55 444')
+            value= INVENTORY1)
         self.inventory1.configure(
             justify="center",
             state="readonly",
             textvariable=self.inv1,
             validate="focusin",
             width=50)
-        _text_ = '11 222 555 33 66 55 44 55 66 55 55 444'
+        _text_ = INVENTORY1
         self.inventory1["state"] = "normal"
         self.inventory1.delete("0", "end")
         self.inventory1.insert("0", _text_)
@@ -66,7 +82,7 @@ class main:
             state="readonly",
             textvariable=self.inv1,
             width=50)
-        _text_ = '11 222 555 33 66 55 44 55 66 55 55 444'
+        _text_ = INVENTORY2
         self.inv2["state"] = "normal"
         self.inv2.delete("0", "end")
         self.inv2.insert("0", _text_)
@@ -101,3 +117,5 @@ class main:
 if __name__ == "__main__":
     app = main()
     app.run()
+
+
